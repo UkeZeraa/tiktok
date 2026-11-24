@@ -9,7 +9,7 @@ export const maxDuration = 300;
 export async function POST(request) {
   const s = await getYtSession();
   if (!s) return NextResponse.json({ error: "not_logged_in" }, { status: 401 });
-  const { blob_url, title, description, tags, privacy, ai } = await request.json();
+  const { blob_url, title, description, tags, privacy, ai, keep_blob } = await request.json();
   if (!blob_url || !title) return NextResponse.json({ error: "Vídeo e título são obrigatórios." }, { status: 400 });
 
   try {
@@ -59,7 +59,7 @@ export async function POST(request) {
     const data = await up.json().catch(() => ({}));
     if (!up.ok || !data.id) throw new Error(data.error?.message || `Falha no envio ao YouTube (${up.status}).`);
 
-    await del(blob_url).catch(() => {});
+    if (!keep_blob) await del(blob_url).catch(() => {});
     return NextResponse.json({
       id: data.id,
       url: `https://youtu.be/${data.id}`,

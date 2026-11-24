@@ -66,3 +66,16 @@ Usa o app da Meta com **API setup with Unified login** (login pelo Facebook com 
 ## Usar
 Abra `SITE_URL/instagram` → **Continuar com o Instagram** → escolha entrar com o Instagram e libere a conta @ukezaraa.
 Escolha o vídeo, escreva a legenda e clique em **Publicar Reel**. O vídeo vai para o Vercel Blob, o Instagram busca de lá, e o arquivo temporário é apagado depois da publicação.
+
+---
+
+# Estúdio (publicação unificada)
+
+`/studio`: vídeo, capa, título, descrição, tags, seleção de plataformas e opções de cada rede, com status ao vivo.
+`/conexoes`: conectar e desconectar TikTok, Instagram e YouTube.
+
+- O vídeo e a capa sobem uma vez para o Vercel Blob e são apagados quando todas as redes terminam.
+- TikTok: o servidor lê o vídeo do Blob em pedaços (até 64 MB vai inteiro, acima disso em partes de 10 MB). A capa é um quadro do vídeo (segundo escolhido), porque a API não aceita imagem.
+- Instagram: a capa vai como `cover_url`.
+- YouTube: a capa vai por `thumbnails.set` (máx. 2 MB, o estúdio reduz a imagem sozinho). Exige canal verificado.
+- Tags viram hashtags no fim da legenda do TikTok e do Instagram, e tags no YouTube.

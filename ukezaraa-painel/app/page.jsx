@@ -7,11 +7,14 @@ export default function Home() {
         <img src="/icon.png" alt="UkeZaraa" width={140} height={140} />
         <h1>UkeZaraa</h1>
         <p>
-          The publishing dashboard for UkeZaraa, a channel of original animated stories.
+          The publishing studio for UkeZaraa, a channel of original animated stories.
           Connect TikTok, Instagram and YouTube, preview each episode, write the caption, choose who can
           see it and post it yourself.
         </p>
-        <Link href="/dashboard" className="btn">Open dashboard</Link>
+        <div className="actions">
+          <Link href="/studio" className="btn">Open studio</Link>
+          <Link href="/dashboard" className="btn ghost">TikTok dashboard</Link>
+        </div>
       </section>
 
       <section className="steps">
