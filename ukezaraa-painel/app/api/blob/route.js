@@ -18,10 +18,22 @@ export async function POST(request) {
           addRandomSuffix: true,
         };
       },
-      onUploadCompleted: async () => {},
     });
     return NextResponse.json(result);
   } catch (e) {
+    console.error("[blob] falha ao gerar token:", e.message);
     return NextResponse.json({ error: e.message }, { status: 400 });
   }
+}
+
+// Diagnóstico sem expor segredos: abra /api/blob no navegador.
+export async function GET() {
+  const t = process.env.BLOB_READ_WRITE_TOKEN || "";
+  const s = await getIgSession();
+  return NextResponse.json({
+    blob_token_presente: Boolean(t),
+    blob_token_formato_ok: t.startsWith("vercel_blob_rw_"),
+    instagram_conectado: Boolean(s),
+    outras_variaveis_blob: Object.keys(process.env).filter((k) => k.includes("BLOB")),
+  });
 }
