@@ -1,39 +1,46 @@
 import { NextResponse } from "next/server";
-import { handleUpload } from "@vercel/blob/client";
+import { handleUploadPresigned } from "@vercel/blob/client";
+import { issueSignedToken } from "@vercel/blob";
 import { getIgSession } from "@/lib/instagram";
 
-// Gera o token para o navegador enviar o vídeo direto ao Vercel Blob (sem o limite de 4,5 MB da função).
+// Loja Blob conectada pelo formato novo da Vercel (OIDC + BLOB_STORE_ID, sem BLOB_READ_WRITE_TOKEN).
+// O navegador recebe um link pré-assinado e envia o vídeo direto ao Blob, sem o limite de 4,5 MB da função.
+const TYPES = ["video/mp4", "video/quicktime"];
+const MAX = 1024 * 1024 * 1024;
+
 export async function POST(request) {
   const body = await request.json();
   try {
-    const result = await handleUpload({
+    const result = await handleUploadPresigned({
       body,
       request,
-      onBeforeGenerateToken: async () => {
+      getSignedToken: async (pathname) => {
         const s = await getIgSession();
         if (!s) throw new Error("Conecte o Instagram antes de enviar vídeos.");
+        const token = await issueSignedToken({
+          pathname,
+          operations: ["put"],
+          allowedContentTypes: TYPES,
+          maximumSizeInBytes: MAX,
+        });
         return {
-          allowedContentTypes: ["video/mp4", "video/quicktime"],
-          maximumSizeInBytes: 1024 * 1024 * 1024,
-          addRandomSuffix: true,
+          token,
+          urlOptions: { allowedContentTypes: TYPES, maximumSizeInBytes: MAX, addRandomSuffix: true },
         };
       },
     });
     return NextResponse.json(result);
   } catch (e) {
-    console.error("[blob] falha ao gerar token:", e.message);
+    console.error("[blob] falha ao gerar link de envio:", e.message);
     return NextResponse.json({ error: e.message }, { status: 400 });
   }
 }
 
 // Diagnóstico sem expor segredos: abra /api/blob no navegador.
 export async function GET() {
-  const t = process.env.BLOB_READ_WRITE_TOKEN || "";
   const s = await getIgSession();
   return NextResponse.json({
-    blob_token_presente: Boolean(t),
-    blob_token_formato_ok: t.startsWith("vercel_blob_rw_"),
+    loja_blob_id_presente: Boolean(process.env.BLOB_STORE_ID),
     instagram_conectado: Boolean(s),
-    outras_variaveis_blob: Object.keys(process.env).filter((k) => k.includes("BLOB")),
   });
 }
