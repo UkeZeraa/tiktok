@@ -1,0 +1,82 @@
+:root {
+  --bg: #0b0b24;
+  --panel: #16163a;
+  --line: #2c2c5e;
+  --text: #eef0ff;
+  --muted: #a4a8d0;
+  --cyan: #3fe0ff;
+  --orange: #ff9a1f;
+  --red: #ff5a6a;
+  --green: #3ee08f;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: radial-gradient(circle at 50% -10%, #2a1a6a 0%, var(--bg) 55%);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+a { color: var(--cyan); }
+main { flex: 1; width: 100%; max-width: 920px; margin: 0 auto; padding: 32px 20px; }
+.top {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding: 14px 24px; border-bottom: 1px solid var(--line); flex-wrap: wrap;
+}
+.brand { display: flex; align-items: center; gap: 10px; color: var(--text); text-decoration: none; font-weight: 800; font-size: 20px; }
+.brand img { border-radius: 8px; }
+.top nav { display: flex; gap: 18px; flex-wrap: wrap; }
+.top nav a { color: var(--muted); text-decoration: none; font-size: 15px; }
+.top nav a:hover { color: var(--text); }
+.foot { display: flex; gap: 10px; justify-content: center; padding: 20px; color: var(--muted); font-size: 14px; border-top: 1px solid var(--line); }
+.foot a { color: var(--muted); }
+
+.hero { text-align: center; padding: 40px 0 20px; }
+.hero img { border-radius: 24px; box-shadow: 0 0 60px #3fe0ff44; }
+.hero h1 { font-size: 40px; margin: 24px 0 8px; }
+.hero p { color: var(--muted); font-size: 18px; max-width: 620px; margin: 0 auto 28px; line-height: 1.5; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  background: linear-gradient(180deg, #ffd45c, var(--orange));
+  color: #1a0b33; font-weight: 800; border: 0; border-radius: 12px;
+  padding: 14px 26px; font-size: 16px; cursor: pointer; text-decoration: none;
+}
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--line); font-weight: 600; }
+.btn.tiktok { background: #fff; color: #000; }
+
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 22px; margin-bottom: 18px; }
+.card h2 { margin: 0 0 14px; font-size: 18px; }
+.steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-top: 30px; }
+.steps .card h3 { margin: 0 0 6px; color: var(--orange); }
+.steps .card p { margin: 0; color: var(--muted); line-height: 1.45; }
+
+.account { display: flex; align-items: center; gap: 14px; }
+.account img { width: 56px; height: 56px; border-radius: 50%; border: 2px solid var(--cyan); }
+.account .name { font-weight: 700; font-size: 18px; }
+.account .sub { color: var(--muted); font-size: 14px; }
+.row { display: flex; gap: 18px; flex-wrap: wrap; }
+.col { flex: 1 1 300px; }
+video.preview { width: 100%; max-height: 520px; background: #000; border-radius: 12px; }
+label.field { display: block; font-weight: 600; margin: 14px 0 6px; }
+textarea, select, input[type=file] {
+  width: 100%; background: #0e0e2a; color: var(--text); border: 1px solid var(--line);
+  border-radius: 10px; padding: 10px 12px; font-size: 15px; font-family: inherit;
+}
+textarea { min-height: 110px; resize: vertical; }
+.counter { text-align: right; color: var(--muted); font-size: 12px; margin-top: 4px; }
+.check { display: flex; align-items: center; gap: 10px; margin: 8px 0; }
+.check input { width: 18px; height: 18px; }
+.check.disabled { color: var(--muted); }
+.hint { color: var(--muted); font-size: 13px; line-height: 1.45; }
+.notice { border-radius: 10px; padding: 12px 14px; margin: 12px 0; font-size: 14px; line-height: 1.45; }
+.notice.err { background: #ff5a6a22; border: 1px solid var(--red); }
+.notice.ok { background: #3ee08f1f; border: 1px solid var(--green); }
+.notice.info { background: #3fe0ff14; border: 1px solid #3fe0ff66; }
+.subchecks { margin-left: 28px; }
+.legal { line-height: 1.65; color: #d6d8f0; }
+.legal h1 { color: var(--text); }
+.legal h2 { color: var(--text); margin-top: 28px; font-size: 20px; }
