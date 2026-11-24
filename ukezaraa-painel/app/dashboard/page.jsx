@@ -139,7 +139,7 @@ export default function Dashboard() {
         <div className="col card">
           <h2>1. Video</h2>
           <input type="file" accept="video/mp4,video/quicktime,video/webm" onChange={pickFile} />
-          <p className="hint">MP4 or MOV. Maximum length for this account: {Math.floor(maxSec / 60)} min {maxSec % 60 ? `${maxSec % 60} s` : ""}.</p>
+          <p className="hint">MP4 or MOV. Maximum length for this account: {Math.floor(maxSec / 60)} min{maxSec % 60 ? ` ${maxSec % 60} s` : ""}.</p>
           {videoUrl && (
             <video
               className="preview"
@@ -163,7 +163,7 @@ export default function Dashboard() {
           <select id="privacy" value={privacy} onChange={(e) => setPrivacy(e.target.value)}>
             <option value="" disabled>Select privacy</option>
             {options.map((o) => (
-              <option key={o} value={o} disabled={brandedBlocksPrivate && o === "SELF_ONLY"}>
+              <option key={o} value={o} disabled={brandedBlocksPrivate && o === "SELF_ONLY"} title={brandedBlocksPrivate && o === "SELF_ONLY" ? "Branded content visibility cannot be set to private." : undefined}>
                 {PRIVACY_LABELS[o] || o}
               </option>
             ))}
@@ -189,9 +189,9 @@ export default function Dashboard() {
             <div className="subchecks">
               <label className="check"><input type="checkbox" checked={yourBrand} onChange={(e) => setYourBrand(e.target.checked)} /> Your brand</label>
               <label className="check"><input type="checkbox" checked={branded} onChange={(e) => { setBranded(e.target.checked); if (e.target.checked && privacy === "SELF_ONLY") setPrivacy(""); }} /> Branded content</label>
-              {discloseIncomplete && <p className="hint">Choose at least one option to continue.</p>}
-              {yourBrand && !branded && <p className="hint">Your video will be labeled “Promotional content”.</p>}
-              {branded && <p className="hint">Your video will be labeled “Paid partnership”. Branded content cannot be private.</p>}
+              {discloseIncomplete && <p className="hint">You need to indicate if your content promotes yourself, a third party, or both.</p>}
+              {yourBrand && !branded && <p className="hint">Your video will be labeled as 'Promotional content'.</p>}
+              {branded && <p className="hint">Your video will be labeled as 'Paid partnership'. Branded content visibility cannot be set to private.</p>}
             </div>
           )}
 
@@ -201,9 +201,11 @@ export default function Dashboard() {
             {branded ? <> and <a href="https://www.tiktok.com/legal/page/global/bc-policy/en" target="_blank" rel="noreferrer">Branded Content Policy</a></> : null}.
           </p>
 
+          <span title={discloseIncomplete ? "You need to indicate if your content promotes yourself, a third party, or both." : undefined} style={{ display: "block" }}>
           <button className="btn" style={{ width: "100%", marginTop: 8 }} disabled={!canPost} onClick={post}>
             {posting ? "Posting…" : "Post to TikTok"}
           </button>
+          </span>
 
           {error && <div className="notice err">{error}</div>}
           {status && (

@@ -42,3 +42,27 @@ npm run dev
 ```
 
 O TikTok só redireciona o login para o endereço cadastrado. Para testar localmente, cadastre também `http://localhost:3000/api/auth/callback` e use `SITE_URL=http://localhost:3000`. Se o TikTok recusar localhost, teste direto pela Vercel.
+
+---
+
+# Instagram (Reels)
+
+Usa o app da Meta com **API setup with Unified login** (login pelo Facebook com `config_id`).
+
+## Na Meta
+- **URL de redirecionamento** (na configuração do login unificado): `SITE_URL/api/auth/instagram/callback`
+- O @ukezaraa precisa ser conta profissional e estar como **Testador do Instagram** (Funções do app). Aceite o convite no Instagram.
+- A análise do app pode ser pulada: é só para as suas próprias contas.
+
+## Na Vercel
+1. **Storage → Create → Blob**, conecte ao projeto. A Vercel cria sozinha a variável `BLOB_READ_WRITE_TOKEN`.
+2. **Settings → Environment Variables**:
+   - `META_APP_ID`: ID do app (Configurações do app → Básico)
+   - `META_APP_SECRET`: Chave secreta do app (Configurações do app → Básico)
+   - `META_CONFIG_ID`: ID da configuração do login unificado
+   - `INSTAGRAM_USERNAME`: `ukezaraa`
+3. **Redeploy**.
+
+## Usar
+Abra `SITE_URL/instagram` → **Continuar com o Instagram** → escolha entrar com o Instagram e libere a conta @ukezaraa.
+Escolha o vídeo, escreva a legenda e clique em **Publicar Reel**. O vídeo vai para o Vercel Blob, o Instagram busca de lá, e o arquivo temporário é apagado depois da publicação.

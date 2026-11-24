@@ -8,7 +8,7 @@ export default function Home() {
         <h1>UkeZaraa</h1>
         <p>
           The publishing dashboard for UkeZaraa, a channel of original animated stories.
-          Connect your TikTok account, preview each episode, write the caption, choose who can
+          Connect TikTok and Instagram, preview each episode, write the caption, choose who can
           see it and post it yourself.
         </p>
         <Link href="/dashboard" className="btn">Open dashboard</Link>

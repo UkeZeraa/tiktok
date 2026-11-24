@@ -12,13 +12,13 @@ export default function Terms() {
       <h2>1. About the service</h2>
       <p>
         UkeZaraa ("we", "the service") is a web dashboard operated by {OWNER} that lets a creator
-        connect a TikTok account and publish original animated videos created for the UkeZaraa channel.
+        connect TikTok and Instagram accounts and publish original animated videos created for the UkeZaraa channel.
         By using the service you agree to these terms.
       </p>
 
       <h2>2. Your account</h2>
       <p>
-        You sign in with your own TikTok account through TikTok Login Kit. You are responsible for the
+        You sign in with your own TikTok account through TikTok Login Kit and with your own Instagram professional account through Meta's login. You are responsible for the
         account you connect and for every post you publish through the dashboard. You can disconnect at
         any time by signing out here or by removing UkeZaraa from the connected apps in your TikTok settings.
       </p>
@@ -27,7 +27,7 @@ export default function Terms() {
       <p>
         You must own, or have every right needed to publish, the videos, audio and text you post. You
         keep all rights to your content. We only send it to TikTok when you click Post, and only to the
-        account you connected. You must follow TikTok's Terms of Service and Community Guidelines.
+        account you connected. You must follow the terms and community guidelines of TikTok and Instagram.
       </p>
 
       <h2>4. How posting works</h2>

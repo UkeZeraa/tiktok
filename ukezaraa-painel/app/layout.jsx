@@ -17,7 +17,8 @@ export default function RootLayout({ children }) {
             <span>UkeZaraa</span>
           </Link>
           <nav>
-            <Link href="/dashboard">Dashboard</Link>
+            <Link href="/dashboard">TikTok</Link>
+            <Link href="/instagram">Instagram</Link>
             <Link href="/terms">Terms of Service</Link>
             <Link href="/privacy">Privacy Policy</Link>
           </nav>

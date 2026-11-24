@@ -24,6 +24,13 @@ export default function Privacy() {
         to TikTok. We do not keep a copy of the video or caption after the upload finishes.
       </p>
 
+      <p>
+        When you connect Instagram, we receive from Meta, with your permission, an access token and the ID,
+        username and profile photo of the Instagram professional account you choose, used only to show the
+        connected account and to publish the Reels you submit. Videos you publish to Instagram are stored
+        temporarily in our file storage so Instagram can fetch them, and are deleted right after publishing.
+      </p>
+
       <h2>3. How we store it</h2>
       <p>
         The access token is kept only in a secure, http-only cookie in your browser and
@@ -36,11 +43,11 @@ export default function Privacy() {
       <h2>5. Your choices and deletion</h2>
       <p>
         Sign out at any time to delete the session cookie. You can also revoke access in the TikTok app under
-        Settings and privacy, Security, Manage app permissions. After that we have no access to your account and keep no data about you.
+        Settings and privacy, Security, Manage app permissions, and in Instagram under Settings, Website permissions, Apps and websites. After that we have no access to your account and keep no data about you.
       </p>
 
       <h2>6. Third parties</h2>
-      <p>Publishing is done through TikTok's official Content Posting API. TikTok's own Privacy Policy applies to content on TikTok.</p>
+      <p>Publishing is done through TikTok's official Content Posting API and Meta's official Instagram API. The privacy policies of TikTok and Meta apply to content on their platforms.</p>
 
       <h2>7. Contact</h2>
       <p>Privacy questions or deletion requests: {EMAIL ? <a href={`mailto:${EMAIL}`}>{EMAIL}</a> : "contact us through the UkeZaraa channel"}.</p>
