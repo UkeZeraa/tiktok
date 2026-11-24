@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { upload } from "@vercel/blob/client";
+import { uploadPresigned } from "@vercel/blob/client";
 
 const STEPS = {
   uploading: "Enviando o vídeo…",
@@ -56,7 +56,8 @@ export default function InstagramPage() {
     setError(""); setPermalink(""); setProgress(0);
     try {
       setStep("uploading");
-      const blob = await upload(`episodios/${file.name}`, file, {
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+      const blob = await uploadPresigned(`episodios/${Date.now()}-${safeName}`, file, {
         access: "public",
         handleUploadUrl: "/api/blob",
         multipart: file.size > 20 * 1024 * 1024,
