@@ -31,6 +31,14 @@ export default function Privacy() {
         temporarily in our file storage so Instagram can fetch them, and are deleted right after publishing.
       </p>
 
+      <p>
+        When you connect YouTube, we receive from Google, with your permission, a refresh token and your
+        channel ID, name and picture (scopes youtube.upload and youtube.readonly), used only to show the
+        connected channel and to upload the videos you submit. Videos are stored temporarily so they can be
+        sent to YouTube, and are deleted right after the upload. Our use of information received from Google
+        APIs adheres to the Google API Services User Data Policy, including the Limited Use requirements.
+      </p>
+
       <h2>3. How we store it</h2>
       <p>
         The access token is kept only in a secure, http-only cookie in your browser and
@@ -43,11 +51,11 @@ export default function Privacy() {
       <h2>5. Your choices and deletion</h2>
       <p>
         Sign out at any time to delete the session cookie. You can also revoke access in the TikTok app under
-        Settings and privacy, Security, Manage app permissions, and in Instagram under Settings, Website permissions, Apps and websites. After that we have no access to your account and keep no data about you.
+        Settings and privacy, Security, Manage app permissions, in Instagram under Settings, Website permissions, Apps and websites, and in your Google account at https://myaccount.google.com/permissions. After that we have no access to your account and keep no data about you.
       </p>
 
       <h2>6. Third parties</h2>
-      <p>Publishing is done through TikTok's official Content Posting API and Meta's official Instagram API. The privacy policies of TikTok and Meta apply to content on their platforms.</p>
+      <p>Publishing is done through TikTok's official Content Posting API and Meta's official Instagram API and the YouTube Data API. YouTube's Terms of Service and Google's Privacy Policy (https://policies.google.com/privacy) apply to content on YouTube. The privacy policies of TikTok and Meta apply to content on their platforms.</p>
 
       <h2>7. Contact</h2>
       <p>Privacy questions or deletion requests: {EMAIL ? <a href={`mailto:${EMAIL}`}>{EMAIL}</a> : "contact us through the UkeZaraa channel"}.</p>

@@ -19,6 +19,7 @@ export default function RootLayout({ children }) {
           <nav>
             <Link href="/dashboard">TikTok</Link>
             <Link href="/instagram">Instagram</Link>
+            <Link href="/youtube">YouTube</Link>
             <Link href="/terms">Terms of Service</Link>
             <Link href="/privacy">Privacy Policy</Link>
           </nav>

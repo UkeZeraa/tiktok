@@ -62,7 +62,7 @@ main { flex: 1; width: 100%; max-width: 920px; margin: 0 auto; padding: 32px 20p
 .col { flex: 1 1 300px; }
 video.preview { width: 100%; max-height: 520px; background: #000; border-radius: 12px; }
 label.field { display: block; font-weight: 600; margin: 14px 0 6px; }
-textarea, select, input[type=file] {
+textarea, select, input[type=file], input.text {
   width: 100%; background: #0e0e2a; color: var(--text); border: 1px solid var(--line);
   border-radius: 10px; padding: 10px 12px; font-size: 15px; font-family: inherit;
 }

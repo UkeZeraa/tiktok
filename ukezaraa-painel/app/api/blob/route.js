@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { handleUploadPresigned } from "@vercel/blob/client";
 import { issueSignedToken } from "@vercel/blob";
 import { getIgSession } from "@/lib/instagram";
+import { getYtSession } from "@/lib/youtube";
 
 // Loja Blob conectada pelo formato novo da Vercel (OIDC + BLOB_STORE_ID, sem BLOB_READ_WRITE_TOKEN).
 // O navegador recebe um link pré-assinado e envia o vídeo direto ao Blob, sem o limite de 4,5 MB da função.
@@ -15,8 +16,8 @@ export async function POST(request) {
       body,
       request,
       getSignedToken: async (pathname) => {
-        const s = await getIgSession();
-        if (!s) throw new Error("Conecte o Instagram antes de enviar vídeos.");
+        const ok = (await getIgSession()) || (await getYtSession());
+        if (!ok) throw new Error("Conecte o Instagram ou o YouTube antes de enviar vídeos.");
         const token = await issueSignedToken({
           pathname,
           operations: ["put"],
@@ -42,5 +43,6 @@ export async function GET() {
   return NextResponse.json({
     loja_blob_id_presente: Boolean(process.env.BLOB_STORE_ID),
     instagram_conectado: Boolean(s),
+    youtube_conectado: Boolean(await getYtSession()),
   });
 }
