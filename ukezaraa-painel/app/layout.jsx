@@ -18,6 +18,7 @@ export default function RootLayout({ children }) {
           </Link>
           <nav>
             <Link href="/studio">Estúdio</Link>
+            <Link href="/agenda">Agenda</Link>
             <Link href="/conexoes">Conexões</Link>
             <Link href="/terms">Terms</Link>
             <Link href="/privacy">Privacy</Link>

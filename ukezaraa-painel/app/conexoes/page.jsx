@@ -13,11 +13,14 @@ const PLATFORMS = [
 
 export default function Conexoes() {
   const [data, setData] = useState(null);
+  const [sched, setSched] = useState(null);
 
   useEffect(() => {
     Promise.all(PLATFORMS.map((p) => fetch(p.me).then((r) => (r.ok ? r.json() : null)).catch(() => null)))
       .then((list) => setData(Object.fromEntries(PLATFORMS.map((p, i) => [p.id, list[i]]))));
+    fetch("/api/agenda/accounts").then((r) => r.json()).then(setSched).catch(() => setSched({ db: false }));
   }, []);
+  const saved = new Set((sched?.accounts || []).map((a) => a.platform));
 
   return (
     <div className="studio">
@@ -26,8 +29,18 @@ export default function Conexoes() {
           <h1>Conexões</h1>
           <p className="hint">As contas que o estúdio usa para publicar.</p>
         </div>
-        <a href="/studio" className="btn small">Ir para o estúdio</a>
+        <div className="head-actions">
+          <a href="/agenda" className="btn ghost small">Agenda</a>
+          <a href="/studio" className="btn small">Ir para o estúdio</a>
+        </div>
       </header>
+
+      {sched && !sched.db && (
+        <div className="notice info">Para agendar posts, configure o banco (SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY) na Vercel. As publicações imediatas já funcionam.</div>
+      )}
+      {sched?.db && !sched.admin && (
+        <div className="notice info">Entre com a senha do estúdio em <a href="/entrar?next=/conexoes">/entrar</a> e reconecte as redes para liberar os agendamentos.</div>
+      )}
 
       <div className="conn-grid">
         {PLATFORMS.map((p) => {
@@ -48,9 +61,15 @@ export default function Conexoes() {
                 <p className="hint">Nenhuma conta conectada.</p>
               )}
               <p className="hint">{p.note}</p>
+              {sched?.db && sched?.admin && (
+                <p className={`sched-flag ${saved.has(p.id) ? "ok" : ""}`}>
+                  {saved.has(p.id) ? "✓ Pronto para agendamentos" : "Reconecte para liberar agendamentos"}
+                </p>
+              )}
               <div className="conn-actions">
                 {d ? (
                   <>
+                    <a className="btn ghost small" href={p.login}>Reconectar</a>
                     <a className="btn ghost small" href={p.logout}>Desconectar</a>
                     <a className="link" href={p.page}>Publicar só aqui</a>
                   </>

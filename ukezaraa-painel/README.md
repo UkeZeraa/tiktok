@@ -79,3 +79,33 @@ Escolha o vídeo, escreva a legenda e clique em **Publicar Reel**. O vídeo vai 
 - Instagram: a capa vai como `cover_url`.
 - YouTube: a capa vai por `thumbnails.set` (máx. 2 MB, o estúdio reduz a imagem sozinho). Exige canal verificado.
 - Tags viram hashtags no fim da legenda do TikTok e do Instagram, e tags no YouTube.
+
+---
+
+# Agenda (agendamentos)
+
+`/agenda`: calendário do mês, próximas publicações, detalhes de cada post (editar data, textos e tags, publicar agora, pausar, tentar de novo, excluir). Arraste um post para outro dia para remarcar. Dois cliques num dia abrem o Estúdio já agendando para aquela data.
+No Estúdio, a seção **5 · Quando** tem "Publicar agora" ou "Agendar".
+
+## Instalação (uma vez)
+
+1. **Banco:** crie um projeto no Supabase (ex.: `ukezaraa`, região São Paulo). Abra *SQL Editor → New query*, cole o arquivo `supabase/schema.sql` e clique em **Run**.
+2. **Vercel → Environment Variables:**
+   - `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY` (Supabase → Project Settings → API; a chave secreta/service_role)
+   - `ADMIN_PASSWORD`: a senha para entrar no estúdio
+   - `TOKEN_KEY`: um texto aleatório longo (32+ caracteres). Criptografa as chaves das contas. Não troque depois.
+   - `CRON_SECRET`: outro texto aleatório
+   Depois, **Redeploy**.
+3. **Entrar:** abra `/entrar` e digite a senha.
+4. **Reconectar as redes:** em `/conexoes`, clique em **Reconectar** em cada rede. Com a senha ativa, as chaves passam a ficar guardadas (criptografadas) no banco, e aparece "Pronto para agendamentos".
+5. **Despertador:** em cron-job.org, crie um cronjob:
+   - URL: `https://SEU-SITE/api/cron?key=SEU_CRON_SECRET`
+   - Agenda: a cada 5 minutos
+   - Tempo limite: o máximo permitido
+   O despertador publica um post vencido por vez. Se dois posts estiverem marcados para o mesmo horário, o segundo sai 5 minutos depois.
+
+## Como funciona
+- O vídeo e a capa ficam guardados no Vercel Blob até a publicação e são apagados quando todas as redes dão certo. Se alguma falhar, os arquivos ficam para você clicar em **Tentar de novo** (só as redes que falharam são refeitas).
+- TikTok: o acesso dura 24 h e é renovado sozinho com a chave de renovação. Instagram: chave sem vencimento. YouTube: chave de renovação.
+- Com `ADMIN_PASSWORD` configurada, Estúdio, Agenda, Conexões e as páginas de Instagram e YouTube pedem senha. A página inicial, Termos, Privacidade e o `/dashboard` do TikTok continuam abertos.
+- Plano grátis do Vercel Blob: 1 GB. Muitos episódios agendados ao mesmo tempo podem passar disso.

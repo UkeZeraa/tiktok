@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { GRAPH, env, igRedirectUri, encodeIg, graph, IG_COOKIE } from "@/lib/instagram";
+import { saveAccountIfAdmin } from "@/lib/accounts";
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
@@ -33,7 +34,15 @@ export async function GET(request) {
   const preferred = process.env.INSTAGRAM_USERNAME;
   const ig = list.find((a) => preferred && a.username === preferred) || list[0];
 
-  const out = NextResponse.redirect(`${site}/instagram`);
+  const saved = await saveAccountIfAdmin("instagram", {
+    label: `@${ig.username}`,
+    picture: ig.profile_picture_url || "",
+    token: tok.access_token,
+    ig_id: ig.id,
+    username: ig.username,
+  });
+
+  const out = NextResponse.redirect(saved ? `${site}/conexoes` : `${site}/instagram`);
   out.cookies.delete("ig_state");
   out.cookies.set(
     IG_COOKIE,

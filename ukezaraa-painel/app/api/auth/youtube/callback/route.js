@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { env, ytRedirectUri, encodeYt, YT_COOKIE } from "@/lib/youtube";
+import { saveAccountIfAdmin } from "@/lib/accounts";
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
@@ -34,7 +35,14 @@ export async function GET(request) {
   const c = ch.items?.[0];
   if (!c) return back("Essa conta do Google não tem canal no YouTube. Escolha a conta (ou o canal de marca) do UkeZaraa.");
 
-  const out = NextResponse.redirect(`${site}/youtube`);
+  const saved = await saveAccountIfAdmin("youtube", {
+    label: c.snippet?.title,
+    picture: c.snippet?.thumbnails?.default?.url || "",
+    refresh_token: tok.refresh_token,
+    channel_id: c.id,
+  });
+
+  const out = NextResponse.redirect(saved ? `${site}/conexoes` : `${site}/youtube`);
   out.cookies.delete("yt_state");
   out.cookies.set(
     YT_COOKIE,

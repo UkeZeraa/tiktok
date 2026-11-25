@@ -78,6 +78,11 @@ export default function Studio() {
   const [ig, setIg] = useState({ feed: true });
   const [yt, setYt] = useState({ privacy: "public", short: true });
 
+  const [mode, setMode] = useState("now");
+  const [when, setWhen] = useState("");
+  const [sched, setSched] = useState({ db: false, admin: false, accounts: [] });
+  const [scheduled, setScheduled] = useState(null);
+
   const [running, setRunning] = useState(false);
   const [upload, setUpload] = useState({ pct: 0, label: "" });
   const [status, setStatus] = useState({});
@@ -93,6 +98,15 @@ export default function Studio() {
       setSelected({ tiktok: Boolean(map.tiktok), instagram: Boolean(map.instagram), youtube: Boolean(map.youtube) });
       setLoading(false);
     });
+    fetch("/api/agenda/accounts").then((r) => r.json()).then(setSched).catch(() => {});
+    const q = new URLSearchParams(window.location.search).get("agendar");
+    if (q) {
+      const d = /^\d{4}-\d{2}-\d{2}$/.test(q) ? new Date(`${q}T18:00`) : new Date(Date.now() + 86400000);
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(q)) d.setHours(18, 0, 0, 0);
+      const pad = (n) => String(n).padStart(2, "0");
+      setMode("schedule");
+      setWhen(`${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`);
+    }
   }, []);
 
   const ttCreator = acc.tiktok?.creator;
@@ -111,8 +125,18 @@ export default function Studio() {
     if (selected.tiktok && !tt.privacy) p.push("Escolha quem pode ver no TikTok.");
     if (selected.tiktok && tt.disclose && !tt.yourBrand && !tt.branded) p.push("TikTok: indique se o conteúdo promove você, terceiros ou ambos.");
     if (selected.tiktok && duration > ttMax) p.push("O vídeo passa do tempo máximo do TikTok desta conta.");
+    if (mode === "schedule") {
+      if (!sched.db) p.push("Agendar precisa do banco configurado (veja o guia de instalação).");
+      else if (!sched.admin) p.push("Entre com a senha do estúdio para agendar.");
+      if (!when) p.push("Escolha a data e a hora.");
+      else if (new Date(when) < new Date(Date.now() + 60000)) p.push("A data do agendamento já passou.");
+      const saved = new Set((sched.accounts || []).map((a) => a.platform));
+      Object.entries(selected).filter(([, v]) => v).forEach(([k]) => {
+        if (sched.db && sched.admin && !saved.has(k)) p.push(`Reconecte o ${PLATFORMS.find((x) => x.id === k).name} em Conexões para liberar agendamentos.`);
+      });
+    }
     return p;
-  }, [video, selected, title, tt, duration, ttMax]);
+  }, [video, selected, title, tt, duration, ttMax, mode, when, sched]);
 
   function pickVideo(f) {
     if (videoUrl) URL.revokeObjectURL(videoUrl);
@@ -180,6 +204,42 @@ export default function Studio() {
     set("youtube", { state: note ? "warn" : "ok", msg: note || "Publicado", link: d.url });
   }
 
+  async function schedule() {
+    setRunning(true); setScheduled(null); setStatus({});
+    try {
+      setUpload({ pct: 0, label: "Guardando o vídeo" });
+      const safe = video.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+      const vb = await uploadPresigned(`agenda/${Date.now()}-${safe}`, video, {
+        access: "public", handleUploadUrl: "/api/blob",
+        multipart: video.size > 20 * 1024 * 1024,
+        onUploadProgress: (e) => setUpload({ pct: Math.round(e.percentage), label: "Guardando o vídeo" }),
+      });
+      let coverBlob = null;
+      if (cover) {
+        setUpload({ pct: 100, label: "Guardando a capa" });
+        const c = await prepareCover(cover);
+        coverBlob = (await uploadPresigned(`agenda/${Date.now()}-capa.jpg`, c, { access: "public", handleUploadUrl: "/api/blob" })).url;
+      }
+      const platforms = {};
+      if (selected.tiktok) platforms.tiktok = {
+        privacy_level: tt.privacy, allow_comment: tt.comment, allow_duet: tt.duet, allow_stitch: tt.stitch,
+        your_brand: tt.disclose && tt.yourBrand, branded: tt.disclose && tt.branded, cover_ms: Number(tt.coverSec) * 1000,
+      };
+      if (selected.instagram) platforms.instagram = { share_to_feed: ig.feed };
+      if (selected.youtube) platforms.youtube = { privacy: yt.privacy, short: yt.short };
+      const { post } = await api("/api/agenda", {
+        scheduled_at: new Date(when).toISOString(), title, description, tags, ai,
+        video_url: vb.url, video_name: video.name, cover_url: coverBlob, platforms,
+      });
+      setScheduled(post);
+    } catch (e) {
+      setUpload({ pct: 0, label: "" });
+      setStatus({ _: { state: "err", msg: e.message } });
+    } finally {
+      setRunning(false);
+    }
+  }
+
   async function publish() {
     setRunning(true); setStatus({});
     const targets = PLATFORMS.filter((p) => selected[p.id]).map((p) => p.id);
@@ -235,7 +295,10 @@ export default function Studio() {
           <h1>Novo post</h1>
           <p className="hint">Suba uma vez e publique em todas as redes.</p>
         </div>
-        <a href="/conexoes" className="btn ghost small">Conexões</a>
+        <div className="head-actions">
+          <a href="/agenda" className="btn ghost small">Agenda</a>
+          <a href="/conexoes" className="btn ghost small">Conexões</a>
+        </div>
       </header>
 
       <div className="studio-grid">
@@ -382,13 +445,36 @@ export default function Studio() {
             );
           })}
 
+          <div className="when">
+            <h2 style={{ margin: "18px 0 10px" }}><span className="step">5</span> Quando</h2>
+            <div className="seg">
+              <button className={mode === "now" ? "on" : ""} onClick={() => setMode("now")} disabled={running}>Publicar agora</button>
+              <button className={mode === "schedule" ? "on" : ""} onClick={() => setMode("schedule")} disabled={running}>Agendar</button>
+            </div>
+            {mode === "schedule" && (
+              <>
+                <input className="text" type="datetime-local" value={when} onChange={(e) => setWhen(e.target.value)} disabled={running} />
+                <p className="hint">Horário de Brasília. O despertador confere a fila a cada 5 minutos, então o post sai em até 5 minutos depois do horário.</p>
+              </>
+            )}
+          </div>
+
+          {status._ && <div className="notice err">{status._.msg}</div>}
+          {scheduled && (
+            <div className="notice ok">
+              Agendado para {new Date(scheduled.scheduled_at).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })}. <a href="/agenda">Ver na agenda</a>
+            </div>
+          )}
+
           {running && upload.label && (
             <div className="progress"><div style={{ width: `${upload.pct}%` }} /><span>{upload.label} {upload.pct < 100 ? `${upload.pct}%` : ""}</span></div>
           )}
 
-          <button className="btn big" disabled={running || problems.length > 0} onClick={publish}
+          <button className="btn big" disabled={running || problems.length > 0} onClick={mode === "schedule" ? schedule : publish}
             title={problems.join(" ")}>
-            {running ? "Publicando…" : `Publicar em ${Object.values(selected).filter(Boolean).length} rede(s)`}
+            {running ? (mode === "schedule" ? "Agendando…" : "Publicando…")
+              : mode === "schedule" ? `Agendar em ${Object.values(selected).filter(Boolean).length} rede(s)`
+              : `Publicar em ${Object.values(selected).filter(Boolean).length} rede(s)`}
           </button>
           {!running && problems.length > 0 && video && <ul className="problems">{problems.map((p) => <li key={p}>{p}</li>)}</ul>}
         </section>

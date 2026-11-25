@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { API, env, redirectUri, encodeSession, TOKEN_COOKIE } from "@/lib/tiktok";
+import { saveAccountIfAdmin } from "@/lib/accounts";
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
@@ -34,7 +35,22 @@ export async function GET(request) {
     return NextResponse.redirect(`${site}/dashboard?error=${encodeURIComponent(data.error_description || "token_failed")}`);
   }
 
-  const out = NextResponse.redirect(`${site}/dashboard`);
+  // Para os agendamentos: guarda as chaves (com renovação) no banco, se for o administrador.
+  const info = await fetch(`${API}/user/info/?fields=open_id,avatar_url,display_name`, {
+    headers: { Authorization: `Bearer ${data.access_token}` },
+    cache: "no-store",
+  }).then((r) => r.json()).catch(() => ({}));
+  const u = info?.data?.user || {};
+  const saved = await saveAccountIfAdmin("tiktok", {
+    label: u.display_name || "TikTok",
+    picture: u.avatar_url || "",
+    access_token: data.access_token,
+    refresh_token: data.refresh_token,
+    expires_at: Date.now() + (data.expires_in || 86400) * 1000,
+    open_id: data.open_id,
+  });
+
+  const out = NextResponse.redirect(saved ? `${site}/conexoes` : `${site}/dashboard`);
   out.cookies.delete("tt_state");
   out.cookies.set(
     TOKEN_COOKIE,
