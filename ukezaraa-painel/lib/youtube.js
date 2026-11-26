@@ -4,7 +4,20 @@ export const YT_COOKIE = "yt_session";
 export const YT_SCOPES = [
   "https://www.googleapis.com/auth/youtube.upload",
   "https://www.googleapis.com/auth/youtube.readonly",
+  "https://www.googleapis.com/auth/youtube.force-ssl", // publicar o comentário do canal
 ].join(" ");
+
+// Publica um comentário do próprio canal no vídeo (a API não permite fixar: isso é feito no app).
+export async function postYouTubeComment(token, videoId, text) {
+  const r = await fetch("https://www.googleapis.com/youtube/v3/commentThreads?part=snippet", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ snippet: { videoId, topLevelComment: { snippet: { textOriginal: String(text).slice(0, 10000) } } } }),
+  });
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(d.error?.message || `YouTube recusou o comentário (${r.status}).`);
+  return d.id;
+}
 
 export function env(name) {
   const v = process.env[name];

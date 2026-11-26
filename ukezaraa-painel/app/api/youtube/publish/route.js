@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { del } from "@vercel/blob";
-import { getYtSession, accessToken } from "@/lib/youtube";
+import { getYtSession, accessToken, postYouTubeComment } from "@/lib/youtube";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
@@ -9,7 +9,7 @@ export const maxDuration = 300;
 export async function POST(request) {
   const s = await getYtSession();
   if (!s) return NextResponse.json({ error: "not_logged_in" }, { status: 401 });
-  const { blob_url, title, description, tags, privacy, ai, keep_blob } = await request.json();
+  const { blob_url, title, description, tags, privacy, ai, keep_blob, comment } = await request.json();
   if (!blob_url || !title) return NextResponse.json({ error: "Vídeo e título são obrigatórios." }, { status: 400 });
 
   try {
@@ -60,10 +60,16 @@ export async function POST(request) {
     if (!up.ok || !data.id) throw new Error(data.error?.message || `Falha no envio ao YouTube (${up.status}).`);
 
     if (!keep_blob) await del(blob_url).catch(() => {});
+    let comment_note = "";
+    if (comment) {
+      try { await postYouTubeComment(token, data.id, comment); comment_note = "Comentário publicado: fixe pelo app."; }
+      catch (e) { comment_note = `Comentário não publicado (${e.message}).`; }
+    }
     return NextResponse.json({
       id: data.id,
       url: `https://youtu.be/${data.id}`,
       privacy: data.status?.privacyStatus,
+      comment_note,
     });
   } catch (e) {
     return NextResponse.json({ error: e.message }, { status: 400 });

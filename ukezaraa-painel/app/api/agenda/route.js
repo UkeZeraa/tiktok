@@ -36,6 +36,7 @@ export async function POST(request) {
     video_url: b.video_url,
     video_name: b.video_name || null,
     cover_url: b.cover_url || null,
+    comment: b.comment ? String(b.comment).slice(0, 2000) : null,
     platforms,
   }).select("*").single();
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });

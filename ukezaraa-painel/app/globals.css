@@ -301,3 +301,36 @@ video.preview { width: 100%; max-height: 520px; background: #000; border-radius:
 .login img { margin: 0 auto; border-radius: 16px; box-shadow: 0 0 40px rgba(63,224,255,.25); }
 .login h1 { margin: 6px 0 0; }
 .login .hint { margin: 0 0 6px; }
+
+textarea.short { min-height: 76px; }
+
+/* Agendar em lote */
+.batch-drop { min-height: 120px; margin-bottom: 8px; }
+.batch-bar { display: flex; gap: 16px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
+.batch-grid { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 18px; align-items: start; }
+@media (max-width: 1100px) { .batch-grid { grid-template-columns: 1fr; } }
+.batch-table { display: flex; flex-direction: column; gap: 8px; }
+.batch-row {
+  display: grid; grid-template-columns: 64px minmax(0, 1fr) 220px 120px; gap: 12px; align-items: start;
+  padding: 12px; border-radius: 12px; background: rgba(0,0,0,.2); border: 1px solid var(--line);
+}
+@media (max-width: 820px) { .batch-row { grid-template-columns: 56px 1fr; } .batch-when, .batch-state { grid-column: 2; } }
+.batch-row.ok { border-color: rgba(62,224,143,.5); }
+.batch-row.err { border-color: rgba(255,90,106,.6); }
+.batch-row.run { border-color: rgba(63,224,255,.6); }
+.batch-ep { display: grid; place-items: center; border-radius: 10px; background: rgba(255,154,31,.12); padding: 6px 0; }
+.batch-ep span { font-size: 10px; font-weight: 800; color: var(--orange); letter-spacing: .6px; }
+.batch-ep strong { font-size: 24px; line-height: 1; }
+.batch-main { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.batch-main details summary { cursor: pointer; color: var(--muted); font-size: 13px; }
+.batch-main textarea { min-height: 110px; margin-top: 6px; }
+.batch-files { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; font-size: 12px; }
+.file { color: var(--muted); background: rgba(255,255,255,.04); padding: 3px 8px; border-radius: 7px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.file.ok { color: #b9f7d6; background: rgba(62,224,143,.1); }
+.batch-when { display: flex; flex-direction: column; gap: 4px; }
+.batch-when .text { padding: 8px 10px; font-size: 14px; }
+.batch-state { font-size: 13px; color: var(--muted); padding-top: 10px; }
+.batch-state.ok { color: var(--green); font-weight: 700; }
+.batch-state.err { color: #ffb3bb; }
+.batch-state.run { color: var(--cyan); }
+.stats.mini { grid-template-columns: 1fr 1fr; margin: 14px 0 0; }

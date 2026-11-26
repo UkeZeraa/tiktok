@@ -71,6 +71,7 @@ export default function Studio() {
   const [tags, setTags] = useState([]);
   const [tagDraft, setTagDraft] = useState("");
   const [ai, setAi] = useState(true);
+  const [pinComment, setPinComment] = useState("");
 
   const [selected, setSelected] = useState({ tiktok: false, instagram: false, youtube: false });
 
@@ -185,15 +186,15 @@ export default function Studio() {
       if (i === 149) throw new Error("O Instagram demorou demais para processar.");
     }
     set("instagram", { msg: "Publicando…" });
-    const done = await api("/api/instagram/finish", { container_id });
-    set("instagram", { state: "ok", msg: "Publicado", link: done.permalink });
+    const done = await api("/api/instagram/finish", { container_id, comment: pinComment || undefined });
+    set("instagram", { state: "ok", msg: ["Publicado", done.comment_note].filter(Boolean).join(". "), link: done.permalink });
   }
 
   async function runYouTube(blobUrl, coverBlob) {
     set("youtube", { state: "run", msg: "Enviando ao YouTube…" });
     const d = await api("/api/youtube/publish", {
       blob_url: blobUrl, title: ytTitle, description: caption,
-      tags, privacy: yt.privacy, ai, keep_blob: true,
+      tags, privacy: yt.privacy, ai, keep_blob: true, comment: pinComment || undefined,
     });
     let note = d.privacy === "private" && yt.privacy !== "private" ? "Saiu privado: o projeto do Google ainda não passou na auditoria." : "";
     if (coverBlob) {
@@ -201,7 +202,7 @@ export default function Studio() {
       try { await api("/api/youtube/thumbnail", { video_id: d.id, cover_url: coverBlob }); }
       catch (e) { note = [note, `Capa não aplicada: ${e.message}`].filter(Boolean).join(" "); }
     }
-    set("youtube", { state: note ? "warn" : "ok", msg: note || "Publicado", link: d.url });
+    set("youtube", { state: note ? "warn" : "ok", msg: [note || "Publicado", d.comment_note].filter(Boolean).join(" "), link: d.url });
   }
 
   async function schedule() {
@@ -229,7 +230,7 @@ export default function Studio() {
       if (selected.youtube) platforms.youtube = { privacy: yt.privacy, short: yt.short };
       const { post } = await api("/api/agenda", {
         scheduled_at: new Date(when).toISOString(), title, description, tags, ai,
-        video_url: vb.url, video_name: video.name, cover_url: coverBlob, platforms,
+        video_url: vb.url, video_name: video.name, cover_url: coverBlob, comment: pinComment || null, platforms,
       });
       setScheduled(post);
     } catch (e) {
@@ -352,6 +353,11 @@ export default function Studio() {
           <p className="hint">Viram hashtags no fim da legenda do TikTok e do Instagram, e tags no YouTube.</p>
 
           <label className="check"><input type="checkbox" checked={ai} onChange={(e) => setAi(e.target.checked)} disabled={running} /> Marcar como conteúdo feito com IA</label>
+
+          <label className="field" htmlFor="pc">Comentário do canal <span className="tag-yt">para fixar</span></label>
+          <textarea id="pc" className="short" maxLength={2000} value={pinComment} onChange={(e) => setPinComment(e.target.value)} disabled={running}
+            placeholder="Ex.: 🕷️ PARTE 14 COM 150 CURTIDAS! A) Comer o gavião · B) Contrato. Comenta A ou B 👇" />
+          <p className="hint">Publicado pela sua conta logo depois do vídeo, no YouTube e no Instagram. As redes não deixam fixar pela API: é só abrir o post e tocar em Fixar.</p>
         </section>
 
         {/* Coluna das plataformas */}

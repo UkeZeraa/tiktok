@@ -1,6 +1,7 @@
 // Publicação feita pelo servidor (sem navegador), usada pelos agendamentos.
 import { getAccount, updateAccountSecret } from "@/lib/accounts";
 import { GRAPH } from "@/lib/instagram";
+import { postYouTubeComment } from "@/lib/youtube";
 
 const MB = 1024 * 1024;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -139,7 +140,12 @@ export async function publishInstagram(post) {
     if (st.status_code === "FINISHED") {
       const pub = await graph(`/${acc.ig_id}/media_publish`, acc.token, { creation_id: c.id }, "POST");
       const m = await graph(`/${pub.id}`, acc.token, { fields: "permalink" }).catch(() => ({}));
-      return { state: "ok", msg: "Publicado", link: m.permalink, media_id: pub.id };
+      const notes = [];
+      if (post.comment) {
+        try { await graph(`/${pub.id}/comments`, acc.token, { message: post.comment }, "POST"); notes.push("Comentário publicado: fixe pelo app."); }
+        catch (e) { notes.push(`Comentário não publicado: ${e.message}`); }
+      }
+      return { state: "ok", msg: ["Publicado", ...notes].join(". "), link: m.permalink, media_id: pub.id };
     }
     if (st.status_code === "ERROR" || st.status_code === "EXPIRED") throw new Error(`O Instagram recusou: ${st.status || st.status_code}`);
   }
@@ -216,7 +222,12 @@ export async function publishYouTube(post) {
       notes.push("Capa não aplicada.");
     }
   }
-  return { state: notes.length ? "warn" : "ok", msg: notes.join(" ") || "Publicado", link: `https://youtu.be/${d.id}` };
+  let commented = "";
+  if (post.comment) {
+    try { await postYouTubeComment(token, d.id, post.comment); commented = " Comentário publicado: fixe pelo app."; }
+    catch (e) { notes.push(`Comentário não publicado (${e.message}).`); }
+  }
+  return { state: notes.length ? "warn" : "ok", msg: (notes.join(" ") || "Publicado.") + commented, link: `https://youtu.be/${d.id}` };
 }
 
 export const PUBLISHERS = { tiktok: publishTikTok, instagram: publishInstagram, youtube: publishYouTube };

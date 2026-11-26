@@ -54,12 +54,13 @@ function Detail({ post, onClose, onChanged }) {
   const [title, setTitle] = useState(post.title || "");
   const [description, setDescription] = useState(post.description || "");
   const [tags, setTags] = useState((post.tags || []).join(", "));
+  const [comment, setComment] = useState(post.comment || "");
   const [busy, setBusy] = useState("");
   const [msg, setMsg] = useState("");
 
   useEffect(() => {
     setWhen(toLocalInput(post.scheduled_at)); setTitle(post.title || ""); setDescription(post.description || "");
-    setTags((post.tags || []).join(", ")); setMsg("");
+    setTags((post.tags || []).join(", ")); setComment(post.comment || ""); setMsg("");
   }, [post]);
 
   const editable = post.status === "scheduled" || post.status === "canceled";
@@ -72,6 +73,7 @@ function Detail({ post, onClose, onChanged }) {
         await call(`/api/agenda/${post.id}`, { method: "PATCH", body: JSON.stringify({
           scheduled_at: new Date(when).toISOString(), title, description,
           tags: tags.split(",").map((t) => t.replace(/^#/, "").trim()).filter(Boolean),
+          comment,
         }) });
         setMsg("Alterações salvas.");
       }
@@ -119,6 +121,9 @@ function Detail({ post, onClose, onChanged }) {
 
       <label className="field small">Tags</label>
       <input className="text" value={tags} disabled={!editable || !!busy} onChange={(e) => setTags(e.target.value)} />
+
+      <label className="field small">Comentário do canal (para fixar)</label>
+      <textarea className="short" value={comment} disabled={!editable || !!busy} onChange={(e) => setComment(e.target.value)} placeholder="Opcional" />
 
       <label className="field small">Redes</label>
       <div className="results">
@@ -218,6 +223,7 @@ export default function Agenda() {
         </div>
         <div className="head-actions">
           <a href="/conexoes" className="btn ghost small">Conexões</a>
+          <a href="/agenda/lote" className="btn ghost small">Agendar em lote</a>
           <a href="/studio?agendar=1" className="btn small">+ Novo agendamento</a>
         </div>
       </header>

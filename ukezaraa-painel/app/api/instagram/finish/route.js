@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 export async function POST(request) {
   const s = await getIgSession();
   if (!s) return NextResponse.json({ error: "not_logged_in" }, { status: 401 });
-  const { container_id, blob_url } = await request.json();
+  const { container_id, blob_url, comment } = await request.json();
 
   const pub = await graph(`/${s.ig_id}/media_publish`, {
     token: s.token,
@@ -19,6 +19,11 @@ export async function POST(request) {
 
   const media = await graph(`/${pub.json.id}`, { token: s.token, params: { fields: "permalink" } });
   if (blob_url) await del(blob_url).catch(() => {});
+  let comment_note = "";
+  if (comment) {
+    const c = await graph(`/${pub.json.id}/comments`, { token: s.token, method: "POST", params: { message: String(comment).slice(0, 2000) } });
+    comment_note = c.ok ? "Comentário publicado: fixe pelo app." : `Comentário não publicado (${c.json?.error?.message || "sem permissão"}).`;
+  }
 
-  return NextResponse.json({ media_id: pub.json.id, permalink: media.json?.permalink || null });
+  return NextResponse.json({ media_id: pub.json.id, permalink: media.json?.permalink || null, comment_note });
 }

@@ -23,6 +23,7 @@ create table if not exists public.posts (
   video_url     text not null,
   video_name    text,
   cover_url     text,
+  comment       text,                                 -- comentário do canal publicado logo após o post (fixar pelo app)
   platforms     jsonb not null default '{}'::jsonb,  -- { "tiktok": {...opções}, "instagram": {...}, "youtube": {...} }
   results       jsonb not null default '{}'::jsonb,  -- { "tiktok": { "state": "ok", "msg": "...", "link": "..." }, ... }
   attempts      int not null default 0,
@@ -37,3 +38,6 @@ alter table public.accounts enable row level security;
 alter table public.posts enable row level security;
 revoke all on public.accounts from anon, authenticated;
 revoke all on public.posts from anon, authenticated;
+
+-- Atualização de 26/11 (rode também se as tabelas já existiam):
+alter table public.posts add column if not exists comment text;

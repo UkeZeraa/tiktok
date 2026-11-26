@@ -20,6 +20,7 @@ export async function PATCH(request, { params }) {
   if (typeof b.title === "string") patch.title = b.title.slice(0, 100);
   if (typeof b.description === "string") patch.description = b.description.slice(0, 2000);
   if (Array.isArray(b.tags)) patch.tags = b.tags.map(String).slice(0, 30);
+  if (typeof b.comment === "string") patch.comment = b.comment.slice(0, 2000) || null;
   if (b.status === "canceled" || b.status === "scheduled") patch.status = b.status;
 
   const { data, error } = await db().from("posts").update(patch).eq("id", id).neq("status", "running").select("*").maybeSingle();
