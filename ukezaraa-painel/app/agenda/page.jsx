@@ -5,6 +5,7 @@ const PLAT = {
   tiktok: { name: "TikTok", color: "#ff2d6f" },
   instagram: { name: "Instagram", color: "#c13584" },
   youtube: { name: "YouTube", color: "#ff3b30" },
+  instagram_story: { name: "Story IG", color: "#f9a03f" },
 };
 const STATUS = {
   scheduled: { label: "Agendado", cls: "s-scheduled" },

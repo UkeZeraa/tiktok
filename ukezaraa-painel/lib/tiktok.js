@@ -17,9 +17,17 @@ export function redirectUri() {
 export async function getSession() {
   const store = await cookies();
   const raw = store.get(TOKEN_COOKIE)?.value;
-  if (!raw) return null;
+  if (raw) {
+    try {
+      return JSON.parse(Buffer.from(raw, "base64url").toString("utf8"));
+    } catch {}
+  }
+  const { adminAccount } = await import("@/lib/accounts");
+  const acc = await adminAccount("tiktok");
+  if (!acc?.access_token) return null;
   try {
-    return JSON.parse(Buffer.from(raw, "base64url").toString("utf8"));
+    const { tiktokToken } = await import("@/lib/publishers"); // renova se estiver vencendo
+    return { access_token: await tiktokToken(), open_id: acc.open_id };
   } catch {
     return null;
   }

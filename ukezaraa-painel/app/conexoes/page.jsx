@@ -27,7 +27,7 @@ export default function Conexoes() {
       <header className="studio-head">
         <div>
           <h1>Conexões</h1>
-          <p className="hint">As contas que o estúdio usa para publicar.</p>
+          <p className="hint">As contas que o estúdio usa para publicar. Conectou uma vez, vale em qualquer aparelho em que você entrar com a senha.</p>
         </div>
         <div className="head-actions">
           <a href="/agenda" className="btn ghost small">Agenda</a>
@@ -70,7 +70,7 @@ export default function Conexoes() {
                 {d ? (
                   <>
                     <a className="btn ghost small" href={p.login}>Reconectar</a>
-                    <a className="btn ghost small" href={p.logout}>Desconectar</a>
+                    <a className="btn ghost small" href={p.logout} onClick={(e) => { if (!confirm(`Desconectar o ${p.name} de todos os aparelhos? Os agendamentos dessa rede param até você reconectar.`)) e.preventDefault(); }}>Desconectar</a>
                     <a className="link" href={p.page}>Publicar só aqui</a>
                   </>
                 ) : (

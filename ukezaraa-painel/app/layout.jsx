@@ -1,11 +1,15 @@
 import "./globals.css";
 import Link from "next/link";
+import AdminBar from "@/components/AdminBar";
 
 export const metadata = {
   title: "UkeZaraa Studio",
   description: "Publishing studio for the original animated stories of the UkeZaraa channel.",
-  icons: { icon: "/icon.png" },
+  icons: { icon: "/icon.png", apple: "/icon.png" },
+  appleWebApp: { capable: true, title: "UkeZaraa", statusBarStyle: "black-translucent" },
 };
+
+export const viewport = { width: "device-width", initialScale: 1, themeColor: "#0d0a1c" };
 
 export default function RootLayout({ children }) {
   return (
@@ -19,9 +23,11 @@ export default function RootLayout({ children }) {
           <nav>
             <Link href="/studio">Estúdio</Link>
             <Link href="/agenda">Agenda</Link>
+            <Link href="/stories">Stories</Link>
             <Link href="/conexoes">Conexões</Link>
             <Link href="/terms">Terms</Link>
             <Link href="/privacy">Privacy</Link>
+            <AdminBar />
           </nav>
         </header>
         <main>{children}</main>

@@ -4,7 +4,7 @@ import { isAdmin } from "@/lib/admin";
 import { isOurBlob } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
-const PLATS = ["tiktok", "instagram", "youtube"];
+const PLATS = ["tiktok", "instagram", "youtube", "instagram_story"];
 
 export async function GET(request) {
   if (!(await isAdmin())) return NextResponse.json({ error: "Entre com a senha do estúdio." }, { status: 401 });

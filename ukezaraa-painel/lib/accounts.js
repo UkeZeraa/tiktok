@@ -29,6 +29,23 @@ export async function updateAccountSecret(platform, secret) {
   if (error) throw new Error(error.message);
 }
 
+// Conta salva no banco, entregue só para quem entrou com a senha do estúdio.
+// É o que deixa qualquer aparelho logado usar as redes, sem reconectar em cada um.
+export async function adminAccount(platform) {
+  try {
+    if (!dbReady() || !(await isAdmin())) return null;
+    return await getAccount(platform);
+  } catch {
+    return null;
+  }
+}
+
+export async function deleteAccountIfAdmin(platform) {
+  if (!dbReady() || !(await isAdmin())) return false;
+  const { error } = await db().from("accounts").delete().eq("platform", platform);
+  return !error;
+}
+
 export async function listAccounts() {
   const { data, error } = await db().from("accounts").select("platform,label,picture,updated_at");
   if (error) throw new Error(error.message);

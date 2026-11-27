@@ -31,12 +31,14 @@ export function ytRedirectUri() {
 
 export async function getYtSession() {
   const raw = (await cookies()).get(YT_COOKIE)?.value;
-  if (!raw) return null;
-  try {
-    return JSON.parse(Buffer.from(raw, "base64url").toString("utf8"));
-  } catch {
-    return null;
+  if (raw) {
+    try {
+      return JSON.parse(Buffer.from(raw, "base64url").toString("utf8"));
+    } catch {}
   }
+  const { adminAccount } = await import("@/lib/accounts");
+  const acc = await adminAccount("youtube");
+  return acc?.refresh_token ? { refresh_token: acc.refresh_token, channel_id: acc.channel_id, title: acc.label, thumb: acc.picture || "" } : null;
 }
 
 export function encodeYt(data) {

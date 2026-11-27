@@ -17,12 +17,15 @@ export function igRedirectUri() {
 export async function getIgSession() {
   const store = await cookies();
   const raw = store.get(IG_COOKIE)?.value;
-  if (!raw) return null;
-  try {
-    return JSON.parse(Buffer.from(raw, "base64url").toString("utf8"));
-  } catch {
-    return null;
+  if (raw) {
+    try {
+      return JSON.parse(Buffer.from(raw, "base64url").toString("utf8"));
+    } catch {}
   }
+  // sem cookie neste aparelho: usa a conta salva (só para o administrador)
+  const { adminAccount } = await import("@/lib/accounts");
+  const acc = await adminAccount("instagram");
+  return acc?.token ? { token: acc.token, ig_id: acc.ig_id, username: acc.username, picture: acc.picture || "" } : null;
 }
 
 export function encodeIg(data) {

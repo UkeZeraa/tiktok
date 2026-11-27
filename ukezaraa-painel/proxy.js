@@ -24,6 +24,7 @@ export const config = {
     "/studio/:path*",
     "/agenda/:path*",
     "/conexoes/:path*",
+    "/stories/:path*",
     "/instagram/:path*",
     "/youtube/:path*",
     "/api/agenda/:path*",

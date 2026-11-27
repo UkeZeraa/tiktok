@@ -20,7 +20,7 @@ export function buildCaption(post) {
 
 /* ---------------- TikTok ---------------- */
 
-async function tiktokToken() {
+export async function tiktokToken() {
   const acc = await getAccount("tiktok");
   if (!acc) throw new Error("TikTok não está salvo para agendamentos. Reconecte em Conexões.");
   if (acc.expires_at && acc.expires_at - Date.now() > 5 * 60 * 1000) return acc.access_token;
@@ -230,4 +230,25 @@ export async function publishYouTube(post) {
   return { state: notes.length ? "warn" : "ok", msg: (notes.join(" ") || "Publicado.") + commented, link: `https://youtu.be/${d.id}` };
 }
 
-export const PUBLISHERS = { tiktok: publishTikTok, instagram: publishInstagram, youtube: publishYouTube };
+/* ---------------- Story do Instagram ---------------- */
+
+export async function publishInstagramStory(post) {
+  const o = post.platforms.instagram_story || {};
+  const acc = await getAccount("instagram");
+  if (!acc) throw new Error("Instagram não está salvo para agendamentos. Reconecte em Conexões.");
+  const params = { media_type: "STORIES" };
+  if (o.kind === "video") params.video_url = post.video_url; else params.image_url = post.video_url;
+  const c = await graph(`/${acc.ig_id}/media`, acc.token, params, "POST");
+  for (let i = 0; i < 40; i++) {
+    await sleep(i === 0 ? 2000 : 4000);
+    const st = await graph(`/${c.id}`, acc.token, { fields: "status_code,status" });
+    if (st.status_code === "FINISHED") {
+      const pub = await graph(`/${acc.ig_id}/media_publish`, acc.token, { creation_id: c.id }, "POST");
+      return { state: "ok", msg: "Story publicado (fica 24 h no ar)", media_id: pub.id };
+    }
+    if (st.status_code === "ERROR" || st.status_code === "EXPIRED") throw new Error(`O Instagram recusou o Story: ${st.status || st.status_code}`);
+  }
+  throw new Error("O Instagram demorou demais para processar o Story.");
+}
+
+export const PUBLISHERS = { tiktok: publishTikTok, instagram: publishInstagram, youtube: publishYouTube, instagram_story: publishInstagramStory };
